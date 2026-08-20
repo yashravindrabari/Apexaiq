@@ -2,10 +2,6 @@
 
 # ApexaiQ Internship Assignment
 
-Submitted by
-
-Yash Bari (IT)
-
 
 ## Index
 
