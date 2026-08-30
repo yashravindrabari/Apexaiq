@@ -67,4 +67,4 @@ Input: Ubuntu Linux 22.04 LTS
 ## Source Code
 
 📄 **Python Implementation:**  
-[View Problem_21.py](Problem_21.py)
+[View Problem_21.py](Solution.py)
