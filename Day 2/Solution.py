@@ -1,48 +1,54 @@
 import re
 
-
-class OSNormalizer:
-
-    def __init__(self):
-        self.rules = {
-            "ubuntu": ("Linux", "Ubuntu"),
-            "windows": ("Windows", "Windows Server"),
-            "win": ("Windows", "Windows Server"),
-            "rhel": ("Linux", "Red Hat"),
-            "redhat": ("Linux", "Red Hat")
-        }
-
-    def normalize(self, text):
-        text = text.lower()
-
-        for key, (family, name) in self.rules.items():
-            if key in text:
-                version = re.search(r"\d+(?:\.\d+)?", text)
-
-                return {
-                    "os_family": family,
-                    "os_name": name,
-                    "os_version": version.group() if version else "Unknown"
-                }
-
-        return {
-            "os_family": "Unknown",
-            "os_name": "Unknown",
-            "os_version": "Unknown"
-        }
-
-    def add_rule(self, key, family, name):
-        self.rules[key] = (family, name)
-
-
-# Test
-os_list = [
-    "Ubuntu 22.04",
-    "Windows_Server_2022",
-    "RHEL-9.3"
+# Saare rules ek list mein hain
+RULES = [
+    {
+        "family": "Linux",
+        "name": "Ubuntu",
+        "match": r"ubuntu",
+        "ver_regex": r"(\d+(?:[\._]\d+)*)"
+    },
+    {
+        "family": "Windows",
+        "name": "Windows Server",
+        "match": r"(?:windows|win)",
+        "ver_regex": r"(\d{4})"
+    },
+    {
+        "family": "Linux",
+        "name": "Red Hat Enterprise Linux",
+        "match": r"(?:rhel|red\s*hat|redhat)",
+        "ver_regex": r"(\d+(?:[\._]\d+)*)"
+    }
 ]
 
-normalizer = OSNormalizer()
+def normalize_os(raw_text):
+    text = raw_text.lower()
+    for rule in RULES:
+        if re.search(rule["match"], text):
+            ver = re.search(rule["ver_regex"], text)
+            clean_ver = ver.group(1).replace("_", ".") if ver else "Unknown"
+            return {
+                "os_family": rule["family"],
+                "os_name": rule["name"],
+                "os_version": clean_ver
+            }
 
-for os in os_list:
-    print(normalizer.normalize(os))
+    return {"os_family": "Unknown", "os_name": "Unknown", "os_version": "Unknown"}
+
+
+# --- Example Test Run ---
+if __name__ == "__main__":
+    os_list = [
+        "Ubuntu 22.04",
+        "ubuntu_22.04",
+        "Ubuntu Linux 22.04 LTS",
+        "Windows_Server_2022",
+        "Microsoft Windows Server 2022",
+        "win_2022",
+        "RHEL-9.3",
+        "RedHat Enterprise Linux 9.3"
+    ]
+
+    for os in os_list:
+        print(f"{os:<32} -> {normalize_os(os)}")
