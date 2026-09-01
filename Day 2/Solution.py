@@ -1,6 +1,6 @@
 import re
 
-# Saare rules ek list mein hain
+
 RULES = [
     {
         "family": "Linux",
